@@ -1,0 +1,47 @@
+# -----------------------------------------------------------------------------
+# Name:       k3d-config.yaml
+# Author:     Raul Pena (raul.pena@gmail.com)
+# Created At: 06/11/2026
+# -----------------------------------------------------------------------------
+
+# Declarative k3d cluster — the local equivalent of your "infrastructure layer"
+# Docs: https://k3d.io/stable/usage/configfile/
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: local-dev
+
+servers: 1
+agents: 2
+image: rancher/k3s:v1.31.5-k3s1
+
+# Expose the k3d loadbalancer on the Mac, so http://localhost works
+ports:
+  - port: 80:80
+    nodeFilters:
+      - loadbalancer
+  - port: 443:443
+    nodeFilters:
+      - loadbalancer
+
+# Built-in local image registry: push to localhost:5050,
+# pull inside the cluster as registry.localhost:5050
+registries:
+  create:
+    name: registry.localhost
+    hostPort: "5050"
+
+options:
+  k3d:
+    wait: true
+    timeout: "120s"
+  k3s:
+    extraArgs:
+      # Disable bundled Traefik — Terraform installs ingress-nginx instead,
+      # keeping parity with what you typically run in the cloud.
+      - arg: --disable=traefik
+        nodeFilters:
+          - server:*
+  kubeconfig:
+    updateDefaultKubeconfig: true
+    switchCurrentContext: true

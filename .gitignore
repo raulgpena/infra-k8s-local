@@ -1,0 +1,21 @@
+# -----------------------------------------------------------------------------
+# Name:       .gitignore
+# Author:     Raul Pena (raul.pena@gmail.com)
+# Created At: 06/11/2026
+# -----------------------------------------------------------------------------
+
+# macOS
+.DS_Store
+
+# Terraform — state and local cache
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+terraform.tfvars
+*.tfplan
+# .terraform.lock.hcl is intentionally committed (locks provider versions)
+
+# Environment secrets
+.env
+*.env
+!.env.example

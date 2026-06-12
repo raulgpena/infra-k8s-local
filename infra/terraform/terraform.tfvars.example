@@ -1,0 +1,9 @@
+# -----------------------------------------------------------------------------
+# Name:       terraform.tfvars.example
+# Author:     Raul Pena (raul.pena@gmail.com)
+# Created At: 06/11/2026
+# -----------------------------------------------------------------------------
+
+kube_context        = "k3d-local-dev"
+environment         = "local"
+enable_cert_manager = true
