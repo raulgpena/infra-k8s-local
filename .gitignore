@@ -19,3 +19,6 @@ terraform.tfvars
 .env
 *.env
 !.env.example
+
+# Helm — packaged chart output
+k8s/helm/dist/

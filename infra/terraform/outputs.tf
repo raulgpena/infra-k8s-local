@@ -11,3 +11,12 @@ output "sample_app_url" {
 output "local_registry" {
   value = "push: localhost:5050  |  pull in-cluster: registry.localhost:5050"
 }
+
+output "argocd_url" {
+  value = var.enable_argocd ? "http://${var.argocd_host}" : "argocd disabled"
+}
+
+output "argocd_admin_password_cmd" {
+  description = "Command to fetch the auto-generated Argo CD admin password"
+  value       = "kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d"
+}

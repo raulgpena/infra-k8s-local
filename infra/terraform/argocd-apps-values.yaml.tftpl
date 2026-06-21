@@ -1,0 +1,61 @@
+# -----------------------------------------------------------------------------
+# Rendered by Terraform via templatefile() — see argocd.tf.
+# Helm values for the argocd-apps chart.
+#
+# Strategy:
+#   * One AppProject per entry in var.argocd_projects (governed here, in TF).
+#   * A single ApplicationSet (Git directory generator) auto-discovers apps
+#     from the gitops repo using the layout: apps/<project>/<app>/...
+#       - path[1] (middle folder) -> the AppProject AND the namespace
+#       - basename (leaf folder)  -> the microservice / Application name
+#   * Add an app => add a folder under apps/<project>/. No TF change needed.
+#   * Add a project => add it to var.argocd_projects AND create apps/<name>/.
+# -----------------------------------------------------------------------------
+
+projects:
+%{ for p in projects ~}
+  ${p.name}:
+    namespace: argocd
+    description: "${p.description}"
+    sourceRepos:
+      - "${repo_url}"
+    destinations:
+      - server: https://kubernetes.default.svc
+        namespace: "*"
+    clusterResourceWhitelist:
+      - group: "*"
+        kind: "*"
+%{ endfor ~}
+
+applicationsets:
+  apps:
+    namespace: argocd
+    goTemplate: false
+    generators:
+      - git:
+          repoURL: "${repo_url}"
+          revision: "${repo_revision}"
+          directories:
+            - path: "apps/*/*"
+    template:
+      metadata:
+        # e.g. apps/team-a/api -> "team-a-api"
+        name: "{{path[1]}}-{{path.basename}}"
+      spec:
+        # Middle folder selects which AppProject this app lands in.
+        project: "{{path[1]}}"
+        source:
+          repoURL: "${repo_url}"
+          targetRevision: "${repo_revision}"
+          path: "{{path}}"
+        destination:
+          server: https://kubernetes.default.svc
+          # One namespace per project: all of a project's microservices
+          # (api/consumer/migration) share the project's namespace.
+          namespace: "{{path[1]}}"
+        syncPolicy:
+          automated:
+            prune: true
+            selfHeal: true
+          syncOptions:
+            - CreateNamespace=true

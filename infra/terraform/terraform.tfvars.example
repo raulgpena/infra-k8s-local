@@ -4,6 +4,23 @@
 # Created At: 06/11/2026
 # -----------------------------------------------------------------------------
 
-kube_context        = "k3d-local-dev"
-environment         = "local"
-enable_cert_manager = true
+kube_context         = "k3d-local-dev"
+environment          = "local"
+enable_cert_manager  = true
+enable_argocd        = true
+argocd_chart_version = "7.7.11"
+argocd_host          = "argocd.127.0.0.1.nip.io"
+
+# argocd-apps: one ApplicationSet auto-discovers apps from the gitops repo
+# (layout: apps/<project>/<app>/), mapping each app to a per-team AppProject.
+enable_argocd_apps        = true
+argocd_apps_chart_version = "2.0.2"
+argocd_apps_values_file   = "" # leave empty to use the generated template
+
+gitops_repo_url      = "https://github.com/your-org/infra-argocd-local"
+gitops_repo_revision = "main"
+
+argocd_projects = [
+  { name = "snow-white", description = "Snow White" },
+  { name = "cars", description = "Cars" },
+]

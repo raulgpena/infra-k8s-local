@@ -1,0 +1,9 @@
+apiVersion: v2
+name: base-app
+description: Reusable base chart for deploying an app on the local k3d cluster (Deployment + optional Service / Ingress / Job).
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+maintainers:
+  - name: Raul Pena
+    email: raul.pena@gmail.com

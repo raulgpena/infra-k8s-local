@@ -1,0 +1,14 @@
+{{ include "base-app.fullname" . }} deployed (env: {{ .Values.env }}{{ if .Values.project }}, project: {{ .Values.project }}{{ end }}).
+
+{{- if .Values.deployment.enabled }}
+Workload : Deployment ({{ .Values.deployment.replicas }} replica(s)) — {{ .Values.image.repository }}:{{ .Values.image.tag }}
+{{- end }}
+{{- if .Values.service.enabled }}
+Service  : {{ include "base-app.fullname" . }}:{{ .Values.service.port }} -> {{ .Values.service.targetPort }}
+{{- end }}
+{{- if .Values.ingress.enabled }}
+Ingress  : http://{{ .Values.ingress.host }}
+{{- end }}
+{{- if .Values.job.enabled }}
+Job      : {{ include "base-app.fullname" . }}{{ if .Values.job.argocdHook }} (Argo CD Sync hook){{ end }}
+{{- end }}

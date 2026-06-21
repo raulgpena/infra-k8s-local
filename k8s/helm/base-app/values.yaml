@@ -1,0 +1,85 @@
+# -----------------------------------------------------------------------------
+# base-app — default values
+#
+# Override these per service (api / consumer / migration). The chart renders:
+#   * a Deployment            (deployment.enabled, default true)
+#   * an optional Service     (service.enabled)
+#   * an optional Ingress     (ingress.enabled)
+#   * an optional Job         (job.enabled) — e.g. database migrations
+# -----------------------------------------------------------------------------
+
+# Override the generated resource name (defaults to the chart/release name).
+nameOverride: ""
+fullnameOverride: ""
+
+# Labels applied everywhere (CLAUDE.md requires app + env at minimum).
+env: local
+project: ""
+
+image:
+  repository: traefik/whoami
+  tag: "v1.10" # never use "latest"
+  pullPolicy: IfNotPresent
+
+# Long-running workload (api, consumer). Disable for job-only services (migration).
+deployment:
+  enabled: true
+  replicas: 1
+  command: []
+  args: []
+  containerPort: 8080
+  env: []
+  envFrom: []
+
+# Runs as a non-root user (required by CLAUDE.md).
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Requests and limits are required on every container, even locally.
+resources:
+  requests:
+    cpu: 100m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+
+# Raw probe specs — use httpGet for HTTP apps, exec for workers.
+probes:
+  enabled: true
+  liveness:
+    httpGet:
+      path: /health
+      port: 8080
+    initialDelaySeconds: 5
+  readiness:
+    httpGet:
+      path: /health
+      port: 8080
+    initialDelaySeconds: 3
+
+service:
+  enabled: true
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  host: ""
+  path: /
+  pathType: Prefix
+
+# One-off Job (e.g. migrations). Set argocdHook: true to run it as an
+# Argo CD Sync hook (re-runs on each sync via BeforeHookCreation).
+job:
+  enabled: false
+  argocdHook: false
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 300
+  command: []
+  args: []
+  env: []
