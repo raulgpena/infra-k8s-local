@@ -24,3 +24,16 @@ argocd_projects = [
   { name = "snow-white", description = "Snow White" },
   { name = "cars", description = "Cars" },
 ]
+
+# base-app chart published to GitHub Packages (ghcr). Apps render from this
+# chart + their own values.yaml in the gitops repo (Argo CD multi-source).
+base_app_chart_repo    = "ghcr.io/raulgpena/charts"
+base_app_chart_name    = "base-app"
+base_app_chart_version = "0.1.0"
+
+# Argo CD repository credentials. Leave empty for public repos/packages.
+# For private ones, fill these in your gitignored terraform.tfvars (never here).
+# gitops_repo_username = "your-github-username"
+# gitops_repo_password = "ghp_xxxxxxxxxxxxxxxxxxxx"   # repo read scope
+# ghcr_username        = "your-github-username"
+# ghcr_password        = "ghp_xxxxxxxxxxxxxxxxxxxx"   # read:packages scope

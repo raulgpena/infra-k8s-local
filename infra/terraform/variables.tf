@@ -61,7 +61,7 @@ variable "argocd_apps_values_file" {
 variable "gitops_repo_url" {
   description = "Git repository Argo CD reads applications from (the source of truth for app folders)"
   type        = string
-  default     = "https://github.com/your-org/gitops-repo"
+  default     = "https://github.com/raulgpena/infra-argocd-local"
 }
 
 variable "gitops_repo_revision" {
@@ -77,8 +77,54 @@ variable "argocd_projects" {
     description = optional(string, "")
   }))
   default = [
-    { name = "team-a", description = "Team A applications" },
-    { name = "team-b", description = "Team B applications" },
-    { name = "platform", description = "Platform / shared services" },
+    { name = "snow-white", description = "Snow White" },
+    { name = "cars", description = "Cars" },
+    { name = "hercules", description = "Hercules" },
   ]
+}
+
+variable "base_app_chart_repo" {
+  description = "OCI registry path hosting the base-app chart (GitHub Packages / ghcr). No oci:// prefix."
+  type        = string
+  default     = "ghcr.io/raulgpena/charts"
+}
+
+variable "base_app_chart_name" {
+  description = "Name of the reusable base application Helm chart"
+  type        = string
+  default     = "base-app"
+}
+
+variable "base_app_chart_version" {
+  description = "Version of the base-app chart used to render each app"
+  type        = string
+  default     = "0.1.0"
+}
+
+# --- Argo CD repository credentials (leave empty for public repos) ---
+
+variable "gitops_repo_username" {
+  description = "Username for the gitops Git repo (empty for public repos)"
+  type        = string
+  default     = ""
+}
+
+variable "gitops_repo_password" {
+  description = "Password/PAT for the gitops Git repo (empty for public repos)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "ghcr_username" {
+  description = "GitHub username to pull the base-app chart from ghcr (empty if the package is public)"
+  type        = string
+  default     = "raulgpena"
+}
+
+variable "ghcr_password" {
+  description = "GitHub token with read:packages to pull base-app from ghcr (empty if the package is public)"
+  type        = string
+  default     = ""
+  sensitive   = true
 }

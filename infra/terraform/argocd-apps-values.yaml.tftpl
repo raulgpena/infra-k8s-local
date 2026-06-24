@@ -8,7 +8,10 @@
 #     from the gitops repo using the layout: apps/<project>/<app>/...
 #       - path[1] (middle folder) -> the AppProject AND the namespace
 #       - basename (leaf folder)  -> the microservice / Application name
-#   * Add an app => add a folder under apps/<project>/. No TF change needed.
+#   * Each app is a MULTI-SOURCE Application:
+#       - source 1: the reusable base-app Helm chart (GitHub Packages / ghcr)
+#       - source 2: the gitops repo, providing apps/<project>/<app>/values.yaml
+#   * Add an app => add a folder with a values.yaml. No TF change needed.
 #   * Add a project => add it to var.argocd_projects AND create apps/<name>/.
 # -----------------------------------------------------------------------------
 
@@ -19,6 +22,7 @@ projects:
     description: "${p.description}"
     sourceRepos:
       - "${repo_url}"
+      - "${chart_repo}"
     destinations:
       - server: https://kubernetes.default.svc
         namespace: "*"
@@ -44,10 +48,18 @@ applicationsets:
       spec:
         # Middle folder selects which AppProject this app lands in.
         project: "{{path[1]}}"
-        source:
-          repoURL: "${repo_url}"
-          targetRevision: "${repo_revision}"
-          path: "{{path}}"
+        sources:
+          # 1) The reusable base-app chart from GitHub Packages (ghcr OCI).
+          - repoURL: "${chart_repo}"
+            chart: "${chart_name}"
+            targetRevision: "${chart_version}"
+            helm:
+              valueFiles:
+                - "$values/apps/{{path[1]}}/{{path.basename}}/values.yaml"
+          # 2) The gitops repo, referenced only to supply the values file.
+          - repoURL: "${repo_url}"
+            targetRevision: "${repo_revision}"
+            ref: values
         destination:
           server: https://kubernetes.default.svc
           # One namespace per project: all of a project's microservices

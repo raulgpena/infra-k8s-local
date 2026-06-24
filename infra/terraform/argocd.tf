@@ -66,6 +66,9 @@ resource "helm_release" "argocd_apps" {
       projects      = var.argocd_projects
       repo_url      = var.gitops_repo_url
       repo_revision = var.gitops_repo_revision
+      chart_repo    = var.base_app_chart_repo
+      chart_name    = var.base_app_chart_name
+      chart_version = var.base_app_chart_version
     })
   ]
 
